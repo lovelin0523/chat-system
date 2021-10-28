@@ -25,7 +25,7 @@ module.exports = {
 				if (conn === connection) {
 					const msg = new Message(res.type,res.room,'你已加入聊天室',res.userName,{
 						connections:roomConnections.length,
-						list:cache.get(res.room),
+						list:cache.get(res.room) || [],
 						time: new Date().toLocaleString('zh-CN', {
 							hour12: false
 						}),
