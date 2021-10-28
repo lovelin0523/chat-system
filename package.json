@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"express": "~4.16.1",
+		"nodejs-websocket": "^1.7.2"
+	}
+}
