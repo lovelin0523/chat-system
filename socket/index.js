@@ -5,6 +5,10 @@ module.exports = {
 	receiveMessage(result, connection, server) {
 		try{
 			let res = JSON.parse(result)
+			if(typeof res != 'object' || !res){
+				throw new Error('系统异常')
+			}
+			console.log(222)
 			//心跳检测消息
 			if (res.type == -1) {
 				const msg = new Message(res.type,res.room,'心跳检测消息回执',res.userName,{
@@ -68,7 +72,12 @@ module.exports = {
 				})
 			}
 		}catch(e){
-			console.log('服务异常',e)
+			const msg = new Message(-2,'',e.message,'',{
+				time: new Date().toLocaleString('zh-CN', {
+					hour12: false
+				})
+			})
+			connection.send(JSON.stringify(msg))
 		}
 	},
 	//出现异常
@@ -101,7 +110,12 @@ module.exports = {
 				}
 			})
 		}catch(e){
-			console.log('服务异常',e)
+			const msg = new Message(-2,'',e.message,'',{
+				time: new Date().toLocaleString('zh-CN', {
+					hour12: false
+				})
+			})
+			connection.send(JSON.stringify(msg))
 		}
 	}
 }
