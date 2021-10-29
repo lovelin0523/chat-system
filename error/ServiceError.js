@@ -3,10 +3,10 @@
  */
 class ServiceError extends Error {
 	constructor(message) {
-		super(message)
-		this.message = message
-		this.name = "ServiceError"
+		super(message);
+		this.message = message;
+		this.name = "ServiceError";
 	}
 }
 
-module.exports = ServiceError
+module.exports = ServiceError;

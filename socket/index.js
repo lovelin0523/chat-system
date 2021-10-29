@@ -1,4 +1,3 @@
-const cache = require('../cache')
 const Message = require('../entity/Message')
 module.exports = {
 	//接收消息
@@ -8,7 +7,6 @@ module.exports = {
 			if(typeof res != 'object' || !res){
 				throw new Error('系统异常')
 			}
-			console.log(222)
 			//心跳检测消息
 			if (res.type == -1) {
 				const msg = new Message(res.type,res.room,'心跳检测消息回执',res.userName,{
@@ -30,7 +28,7 @@ module.exports = {
 					if (conn === connection) {
 						const msg = new Message(res.type,res.room,'你已加入聊天室',res.userName,{
 							connections:roomConnections.length,
-							list:cache.get(res.room) || [],
+							list:Message.get(res.room) || [],
 							time: new Date().toLocaleString('zh-CN', {
 								hour12: false
 							}),
@@ -40,16 +38,26 @@ module.exports = {
 						})
 						conn.send(JSON.stringify(msg))
 					} else {
-						const msg = new Message(res.type,res.room,`${res.userName}加入了聊天室`,res.userName,{
-							connections:roomConnections.length,
-							time: new Date().toLocaleString('zh-CN', {
-								hour12: false
-							}),
-							users:roomConnections.map(item=>{
-								return item.userName
+						//查找是否同时多个在线
+						if(conn.userName === connection.userName){
+							const msg = new Message(-2,conn.room,'你在另一个地方登录，当前主机被迫下线',conn.userName,{
+								time: new Date().toLocaleString('zh-CN', {
+									hour12: false
+								})
 							})
-						})
-						conn.send(JSON.stringify(msg))
+							conn.send(JSON.stringify(msg))
+						}else {
+							const msg = new Message(res.type,res.room,`${res.userName}加入了聊天室`,res.userName,{
+								connections:roomConnections.length,
+								time: new Date().toLocaleString('zh-CN', {
+									hour12: false
+								}),
+								users:roomConnections.map(item=>{
+									return item.userName
+								})
+							})
+							conn.send(JSON.stringify(msg))
+						}
 					}
 				})
 			}
@@ -61,7 +69,7 @@ module.exports = {
 					})
 				})
 				//将消息缓存
-				cache.add(msg,res.room)
+				Message.add(msg,res.room)
 				//获取该房间的所有连接
 				const roomConnections = server.connections.filter(item=>{
 					return item.room == res.room

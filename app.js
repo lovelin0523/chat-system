@@ -46,7 +46,8 @@ app.all("*", (req, res, next) => {
 		next()
 });
 
-app.get('/checkUserName',(req,res,next)=>{
+//检查用户昵称
+app.get('/chatSys/checkUserName',(req,res,next)=>{
 	const userName = req.query.userName
 	const room = req.query.room
 	if(!userName){
@@ -61,23 +62,14 @@ app.get('/checkUserName',(req,res,next)=>{
 		next(new ServiceError('用户名不能超过10个字符，请重新设置'))
 		return
 	}
-	const keywords = ['凯','凌','kai']
-	const has = keywords.some(item=>{
-		return userName.includes(item)
-	})
-	if(has){
-		next(new ServiceError('用户名不符合规范，请重新设置'))
-		return
-	}
 	//获取该房间的所有连接
 	const roomConnections = server.connections.filter(item=>{
 		return item.room == room
 	})
 	//判断用户名是否已存在
 	const flag = roomConnections.some(item=>{
-		return item.userName === userName
+		return item.userName === userName && item.headers.origin != req.headers.origin
 	})
-	
 	if(flag){
 		next(new ServiceError('用户名已存在，请重新设置'))
 		return
